@@ -7,7 +7,7 @@ let userContainer = document.querySelector(".container");
 
 
 const users = JSON.parse(localStorage.getItem("users")) || [];
-localStorage.clear()
+
 
 const addUser = (username, email, password) => { 
     users.push({
