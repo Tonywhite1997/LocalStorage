@@ -46,8 +46,9 @@ const createUserElement = ({username, email, password}) =>{
 users.forEach(createUserElement);
 
 userContainer.style.display = users.length === 0 ? "none" : "flex"
+clearButton.style.display = users.length === 0 ? "none" : "block"
 
-form.addEventListener("submit", event =>{
+form.addEventListener("submit", () =>{
     if(!username.value || !password.value || !email.value){
         alert("Please fill out all fields!")
         return false
