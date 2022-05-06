@@ -1,66 +1,71 @@
-let form = document.querySelector('#form');
-let username = document.querySelector('#name');
-let email = document.querySelector('#email');
-let password = document.querySelector('#password');
-let button = document.querySelector('#button');
-let clearButton = document.querySelector('.clear-button')
-let userContainer = document.querySelector(".container");
+const form = document.querySelector('#form');
+const username = document.querySelector('#name');
+const email = document.querySelector('#email');
+const password = document.querySelector('#password');
+const button = document.querySelector('#button');
+const messageBox = document.querySelector('.message')
+const userContainer = document.querySelector(".container");
+const removeButton = document.querySelector('.remove-button')
 
-clearButton.addEventListener('click', ()=>{
-    localStorage.clear()
-    users.length > 0 ? location.reload() : alert("Storage is empty")
-    
-})
+let oldUsers = JSON.parse(localStorage.getItem("users")) || []
 
-
-const users = JSON.parse(localStorage.getItem("users")) || [];
-// localStorage.clear()
-
-const addUser = (username, email, password) => { 
-    users.push({
-        username,
-        email,
-        password,
-    });
-
-    localStorage.setItem("users", JSON.stringify(users));
-
-    return {username, email, password};
-};
-const createUserElement = ({username, email, password}) =>{
-    const userDiv = document.createElement('div');
-    const userName = document.createElement('h3');
-    const userEmail = document.createElement('p');
-    const userPassword = document.createElement('p');
-
-    userName.innerText = "Username: " + username;
-    userEmail.innerText = "User Email: " + email;
-    userPassword.innerText = "User Password: " + password;
-
-    userDiv.append(userName, userEmail, userPassword);
-    userContainer.appendChild(userDiv);
-
-    userContainer.style.display = users.length === 0 ? "none" : "flex"
+let addUser = (username, email, password) =>{
+    oldUsers.push({username, email, password} )
+    localStorage.setItem("users", JSON.stringify(oldUsers))
+    return {username, email}
 }
 
-users.forEach(createUserElement);
 
-userContainer.style.display = users.length === 0 ? "none" : "flex"
-clearButton.style.display = users.length === 0 ? "none" : "block"
 
-form.addEventListener("submit", () =>{
-    if(!username.value || !password.value || !email.value){
-        alert("Please fill out all fields!")
-        return false
+
+function createUserElement({username, email}){
+    let usernameRow = document.createElement('h3')
+    let emailRow = document.createElement('p')
+    let userDiv = document.createElement('div')
+
+    usernameRow.innerText = `Username: ${username}`;
+    emailRow.innerText = `Email: ${email}`
+
+    userDiv.append(usernameRow, emailRow)
+    userContainer.appendChild(userDiv)
+}
+
+oldUsers.forEach(createUserElement)
+
+oldUsers.length === 0 ? userContainer.style.display = "none" : 'block'
+
+oldUsers.length === 0 ? removeButton.style.display = "none" : removeButton.style.display = "block"
+
+removeButton.addEventListener('click', ()=>{
+    localStorage.clear()
+    location.reload()
+})
+
+form.addEventListener('submit', (event)=>{
+    if(!email.value, !username.value, !password.value){
+        event.preventDefault()
+        messageBox.innerText = "All fields are required!"
+        return;
     }
-
-
-    const newUser = addUser(
-        username.value,
-        email.value,
-        password.value,
-    );
-    
+    else{
+        messageBox.innerText = "";
+    }
+    for(let oldUser of oldUsers){
+        if(username.value === oldUser.username && email.value === oldUser.email){
+            event.preventDefault()
+            messageBox.innerText = "User already exists!"
+            return
+        }
+        else{
+            messageBox.innerText = "";
+        }
+    }
+    const newUser = addUser(username.value,email.value, password.value)
+   
+    // let oldUsers = JSON.parse(localStorage.getItem("users")) || []
+    // oldUsers.push(newUser)
+   
     createUserElement(newUser)
+    // location.reload()
     
 })
